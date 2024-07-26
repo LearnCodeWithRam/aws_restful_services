@@ -6,7 +6,7 @@ pipeline {
     DOCKER_REGISTRY = 'docker.io'  // Docker Hub default registry
     EC2_USER = 'ubuntu'
     EC2_HOST = 'ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
-    DOCKER_REGISTRY_CREDS = '${docker_registry_creds}'
+    //DOCKER_REGISTRY_CREDS = 'docker_registry_creds'
     SSH_KEY_ID = 'ssh-key'
   }
 
@@ -27,7 +27,7 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-        withCredentials([usernamePassword(credentialsId: "${docker_registry_creds}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+        withCredentials([usernamePassword(credentialsId: "${dockerhub}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
           script {
             // Login to Docker registry
             sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY"
