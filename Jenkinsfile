@@ -35,9 +35,19 @@ pipeline {
                     sshagent(['ec2-ssh-key']) {
                         sh """
                           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<EOF
+                          # Pull the new Docker image
                           docker pull $DOCKER_IMAGE
-                          docker stop $CONTAINER_NAME || true
-                          docker rm $CONTAINER_NAME || true
+                          
+                          # Get the container ID of the running container with the specific image
+                          CONTAINER_ID=\$(docker ps -q -f "ancestor=$DOCKER_IMAGE")
+                          
+                          # Stop and remove the container if it exists
+                          if [ -n "\$CONTAINER_ID" ]; then
+                            docker stop \$CONTAINER_ID
+                            docker rm \$CONTAINER_ID
+                          fi
+                          
+                          # Run the new container with a specified name
                           docker run -d -p 8081:8081 --name $CONTAINER_NAME $DOCKER_IMAGE
                           EOF
                         """
