@@ -5,6 +5,7 @@ pipeline {
         DOCKER_REGISTRY = 'docker.io'  // Docker Hub default registry
         EC2_USER = 'ubuntu'
         EC2_HOST = 'ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
+        CONTAINER_NAME = 'my-springboot-app'  // Name of the container
     }
     stages {
         stage('Build') {
@@ -35,9 +36,9 @@ pipeline {
                         sh """
                           ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<EOF
                           docker pull $DOCKER_IMAGE
-                          docker stop my-springboot-app || true
-                          docker rm my-springboot-app || true
-                          docker run -d -p 8081:8081 --name my-springboot-app $DOCKER_IMAGE
+                          docker stop $CONTAINER_NAME || true
+                          docker rm $CONTAINER_NAME || true
+                          docker run -d -p 8081:8081 --name $CONTAINER_NAME $DOCKER_IMAGE
                           EOF
                         """
                     }
