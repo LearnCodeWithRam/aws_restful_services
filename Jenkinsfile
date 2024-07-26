@@ -6,7 +6,8 @@ pipeline {
     DOCKER_REGISTRY = 'docker.io'  // Docker Hub default registry
     EC2_USER = 'ubuntu'
     EC2_HOST = 'ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
-    DOCKER_REGISTRY_CREDS = 'docker_registry_creds'  // Ensure this matches your credentials ID
+    DOCKER_USERNAME = 'genaiihub24'
+    DOCKER_PASSWORD = 'Indore@452010'
     SSH_KEY_ID = 'ssh-key'
   }
 
@@ -27,15 +28,11 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-      echo '${DOCKER_REGISTRY_CREDS}'
-      
-        withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-          script {
-            // Login to Docker registry
-            sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY"
-            // Push Docker image
-            docker.image(DOCKER_IMAGE).push()
-          }
+        script {
+          // Login to Docker registry
+          sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY"
+          // Push Docker image
+          docker.image(DOCKER_IMAGE).push()
         }
         sshagent([SSH_KEY_ID]) {
           sh """
@@ -49,10 +46,3 @@ pipeline {
         }
       }
     }
-  }
-  post {
-    always {
-      sh 'docker logout'
-    }
-  }
-}
