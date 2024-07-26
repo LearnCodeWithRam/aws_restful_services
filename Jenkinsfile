@@ -14,6 +14,7 @@ pipeline {
     stage('Build') {
       steps {
         script {
+          // Build Docker image
           def dockerImage = docker.build(DOCKER_IMAGE)
         }
       }
@@ -28,7 +29,9 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: "${DOCKER_REGISTRY_CREDS}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
           script {
+            // Login to Docker registry
             sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY"
+            // Push Docker image
             docker.image(DOCKER_IMAGE).push()
           }
         }
@@ -51,4 +54,6 @@ pipeline {
     }
   }
 }
+
+
 
