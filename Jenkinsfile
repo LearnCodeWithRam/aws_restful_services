@@ -34,7 +34,7 @@ pipeline {
                     // SSH and deploy
                     sshagent(['ec2-ssh-key']) {
                         sh """
-                          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<EOF
+                          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<'EOF'
                           # Pull the new Docker image
                           docker pull $DOCKER_IMAGE
                           
