@@ -16,7 +16,6 @@ AAAEBQFLbzye8qgmKtXxLZiQnXHGI7jDgGXzwZBp0sZwEvPRE7U2TffhV+wkfp2PZ4J0T1
 nb8IQIjWlbGs3nO2MhW5AAAAF3VidW50dUBpcC0xNzItMzEtMjAtMjI0AQIDBAUG
 -----END OPENSSH PRIVATE KEY-----'''
   }
-
   stages {
     stage('Build') {
       steps {
@@ -41,8 +40,13 @@ nb8IQIjWlbGs3nO2MhW5AAAAF3VidW50dUBpcC0xNzItMzEtMjAtMjI0AQIDBAUG
           docker.image(DOCKER_IMAGE).push()
         }
         script {
+          // Write the SSH key to a temporary file
+          writeFile file: '/tmp/id_rsa', text: "${SSH_PRIVATE_KEY.replace('\\n', '\n')}"
+          // Set appropriate permissions for the SSH key
+          sh "chmod 600 /tmp/id_rsa"
+          // Deploy to EC2
           sh """
-            ssh -o StrictHostKeyChecking=no -i <(echo "$SSH_PRIVATE_KEY") $EC2_USER@$EC2_HOST <<EOF
+            ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa $EC2_USER@$EC2_HOST <<EOF
             docker pull $DOCKER_IMAGE
             docker stop my-springboot-app || true
             docker rm my-springboot-app || true
