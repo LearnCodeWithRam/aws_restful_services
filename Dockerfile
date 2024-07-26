@@ -6,6 +6,6 @@ RUN addgroup -S spring && adduser -S spring -G spring
 
 USER spring:spring
 
-COPY target/SpringbootV1-0.0.1-SNAPSHOT.war SpringbootV1-0.0.1-SNAPSHOT.war
+COPY target/springboot-crud-restful-webservices-0.0.1-SNAPSHOT.war springboot-crud-restful-webservices-0.0.1-SNAPSHOT.war
 
-ENTRYPOINT ["java","-jar","/SpringbootV1-0.0.1-SNAPSHOT.war"]
+ENTRYPOINT ["java","-jar","/springboot-crud-restful-webservices-0.0.1-SNAPSHOT.war"]
