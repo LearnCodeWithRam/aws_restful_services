@@ -47,6 +47,9 @@ pipeline {
                             docker rm \$CONTAINER_ID
                           fi
                           
+                          # Remove any stopped container with the name to avoid conflicts
+                          docker container prune -f || true
+                          
                           # Run the new container with a specified name
                           docker run -d -p 8081:8081 --name $CONTAINER_NAME $DOCKER_IMAGE
                           EOF
