@@ -8,6 +8,8 @@ pipeline {
     EC2_HOST = 'ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
     DOCKER_USERNAME = 'genaiihub24'
     DOCKER_PASSWORD = 'Indore@452010'
+    DOCKER_USERNAME = 'your_dockerhub_username'
+    DOCKER_PASSWORD = 'your_dockerhub_password'
     SSH_KEY_ID = 'ssh-key'
   }
 
@@ -46,3 +48,11 @@ pipeline {
         }
       }
     }
+  }
+  post {
+    always {
+      sh 'docker logout'
+    }
+  }
+}
+    
