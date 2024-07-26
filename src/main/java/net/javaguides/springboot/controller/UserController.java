@@ -29,6 +29,7 @@ public class UserController {
 	public List<User> getAllUsers() {
 		return this.userRepository.findAll();
 	}
+	
 
 	// get user by id
 	@GetMapping("/{id}")
