@@ -1,70 +1,64 @@
 pipeline {
     agent any
-
     environment {
-        DOCKER_CREDENTIALS_ID = 'docker_registry_creds'
-        SSH_KEY_ID = 'ssh-key'
-        DOCKER_IMAGE = 'genaiihub24/my-docker:springboot-rest-v2'
-        CONTAINER_NAME = 'my-springboot-app'
-        EC2_HOST = 'ubuntu@ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
+        DOCKER_IMAGE = "genaiihub24/my-docker:springboot-rest-v2"
+        DOCKER_REGISTRY = 'docker.io'  // Docker Hub default registry
+        EC2_USER = 'ubuntu'
+        EC2_HOST = 'ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
+        CONTAINER_NAME = 'my-springboot-app'  // Name of the container
     }
-
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build') {
             steps {
                 script {
-                    // Build the Docker image
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    // Build Docker image
+                    def dockerImage = docker.build(DOCKER_IMAGE)
                 }
             }
         }
-
-        stage('Push') {
+        stage('Test') {
             steps {
-                withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        // Login to Docker Hub
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-
-                        // Tag and push the Docker image
-                        sh 'docker tag $DOCKER_IMAGE $DOCKER_USERNAME/$DOCKER_IMAGE'
-                        sh 'docker push $DOCKER_USERNAME/$DOCKER_IMAGE'
-                    }
-                }
+                // Add your test commands here if any
+                echo 'No tests configured'
             }
         }
-
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: SSH_KEY_ID, keyFileVariable: 'SSH_KEY')]) {
-                    script {
-                        // Stop and remove existing container if it exists
-                        sh '''
-                        #!/bin/bash
-                        set -e
-                        CONTAINER_ID=$(ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_HOST "docker ps -q -f name=$CONTAINER_NAME")
-                        if [ -n "$CONTAINER_ID" ]; then
-                            ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_HOST "docker stop $CONTAINER_ID && docker rm $CONTAINER_ID"
-                        fi
-
-                        # Pull the latest image and start a new container
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no $EC2_HOST "
-                        docker pull $DOCKER_IMAGE
-                        docker run -d -p 8081:8081 --name $CONTAINER_NAME $DOCKER_IMAGE
-                        "
-                        '''
+                script {
+                    // Docker login and push
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $DOCKER_REGISTRY"
+                        docker.image(DOCKER_IMAGE).push()
+                    }
+                    
+                    // SSH and deploy
+                    sshagent(['ec2-ssh-key']) {
+                        sh """
+                          ssh -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST <<'EOF'
+                          # Pull the new Docker image
+                          docker pull $DOCKER_IMAGE
+                          
+                          # Get the container ID of the running container with the specific image
+                          CONTAINER_ID=\$(docker ps -q -f "ancestor=$DOCKER_IMAGE")
+                          
+                          # Stop and remove the container if it exists
+                          if [ -n "\$CONTAINER_ID" ]; then
+                            docker stop \$CONTAINER_ID
+                            docker rm \$CONTAINER_ID
+                          fi
+                          
+                          # Remove any stopped container with the name to avoid conflicts
+                          docker container prune -f || true
+                          
+                          # Run the new container with a specified name
+                          docker run -d -p 8081:8081 --name $CONTAINER_NAME $DOCKER_IMAGE
+                         
+                        """
                     }
                 }
             }
         }
     }
-
     post {
         always {
             sh 'docker logout'
