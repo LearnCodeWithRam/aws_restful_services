@@ -4,7 +4,7 @@ pipeline {
         DOCKER_IMAGE = "genaiihub24/my-docker:springboot-rest-v2"
         DOCKER_REGISTRY = 'docker.io'  // Docker Hub default registry
         EC2_USER = 'ubuntu'
-        EC2_HOST = 'ec2-54-169-205-152.ap-southeast-1.compute.amazonaws.com'
+        EC2_HOST = 'ec2-52-77-243-82.ap-southeast-1.compute.amazonaws.com'
         CONTAINER_NAME = 'my-springboot-app'  // Name of the container
     }
     stages {
