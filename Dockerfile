@@ -1,5 +1,5 @@
 # Use an official OpenJDK 17 runtime as a parent image
-FROM adoptopenjdk/openjdk17:jdk-17.0.2_8-alpine
+FROM eclipse-temurin:17-jre-alpine
 
 # Expose port 8081
 EXPOSE 8081
