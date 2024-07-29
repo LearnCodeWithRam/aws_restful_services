@@ -18,7 +18,7 @@ import net.javaguides.springboot.exception.ResourceNotFoundException;
 import net.javaguides.springboot.repository.UserRepository;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/ramapi/users")
 public class UserController {
 
 	@Autowired
