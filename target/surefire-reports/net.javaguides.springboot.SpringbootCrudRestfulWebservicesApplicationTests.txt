@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: net.javaguides.springboot.SpringbootCrudRestfulWebservicesApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.231 s - in net.javaguides.springboot.SpringbootCrudRestfulWebservicesApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.981 s - in net.javaguides.springboot.SpringbootCrudRestfulWebservicesApplicationTests
