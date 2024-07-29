@@ -18,7 +18,7 @@ import net.javaguides.springboot.exception.ResourceNotFoundException;
 import net.javaguides.springboot.repository.UserRepository;
 
 @RestController
-@RequestMapping("/ramapi/users")
+@RequestMapping("/api/users")
 public class UserController {
 
 	@Autowired
@@ -35,7 +35,7 @@ public class UserController {
 	@GetMapping("/{id}")
 	public User getUserById(@PathVariable (value = "id") long userId) {
 		return this.userRepository.findById(userId)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with id :" + userId));
+				.orElseThrow(() -> new ResourceNotFoundException("ramanuj user Not found with id :" + userId));
 	}
 
 	// create user
