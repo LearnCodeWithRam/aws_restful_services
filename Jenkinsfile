@@ -51,7 +51,7 @@ pipeline {
                           docker container prune -f || true
                           
                           # Run the new container with a specified name
-                          docker run -d -p 8081:8081 --name $CONTAINER_NAME $DOCKER_IMAGE
+                          docker run -d -p 8081:5000 --name $CONTAINER_NAME $DOCKER_IMAGE
                          
                         """
                     }
